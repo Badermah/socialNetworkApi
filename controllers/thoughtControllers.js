@@ -50,40 +50,29 @@ module.exports = {
   async updateThought(req, res) {
     try {
       const thought = await Thought.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body,
-        { new: true, runValidators: true }
+        { _id: req.params.thoughtId },
+        { $set: req.body },
+        { new: true }
       );
       if (!thought) {
-        res.status(404).json({ message: "No thought found with this id!" });
-        return;
+        return res.status(404).json({ message: "No thought with that ID" });
       }
       res.json(thought);
     } catch (err) {
-      console.log(err);
-      res.status(400).json(err);
+      res.status(500).json(err);
     }
   },
   async deleteThought(req, res) {
     try {
-      const thought = await Thought.findOneAndDelete({ _id: req.params.id });
+      const thought = await Thought.findOneAndDelete({
+        _id: req.params.thoughtId,
+      });
       if (!thought) {
-        res.status(404).json({ message: "No thought found with this id!" });
-        return;
-      }
-      const user = await User.findOneAndUpdate(
-        { username: thought.username },
-        { $pull: { thoughts: thought._id } },
-        { new: true }
-      );
-      if (!user) {
-        res.status(404).json({ message: "No user found with this id!" });
-        return;
+        return res.status(404).json({ message: "No thought with that ID" });
       }
       res.json(thought);
     } catch (err) {
-      console.log(err);
-      res.status(400).json(err);
+      res.status(500).json(err);
     }
   },
   async addReaction(req, res) {
